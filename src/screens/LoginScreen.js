@@ -7,7 +7,7 @@ import {
   Text,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import TextInputComponent from "../components/TextInputComponent";
 import ButtonComponent from "../components/ButtonComponent";
@@ -22,19 +22,30 @@ const LoginScreen = () => {
   const source = require("../../assets/logo.png");
   const navigation = useNavigation();
 
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) navigation.replace("Main");
+      } catch (error) {
+        console.log("error message", error);
+      }
+    };
+    checkLoginStatus();
+  });
+
   const handleLogin = () => {
     const user = {
       email: email,
       password: password,
     };
-    console.log(JSON.stringify(user));
     axios
       .post("http://192.168.0.29:8000/login", user)
       .then((response) => {
         // console.log(JSON.stringify(response));
         const token = response.data.token;
         AsyncStorage.setItem("authToken", token);
-        navigation.replace("Home");
+        navigation.replace("Main");
       })
       .catch((error) => {
         Alert.alert("Login Error", "Invalid Email");
