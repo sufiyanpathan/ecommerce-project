@@ -14,6 +14,7 @@ const TextInputComponent = ({
     <View style={textOuterCss}>
       {icon}
       <TextInput
+        placeholderTextColor="black"
         secureTextEntry={secureTextEntry}
         value={value}
         onChangeText={onChangeText}

@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   Image,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import TextInputComponent from "../components/TextInputComponent";
@@ -15,6 +16,8 @@ import {
   AntDesign,
   Ionicons,
 } from "@expo/vector-icons";
+import { Keywords } from "../utils/enum";
+import axios from "axios";
 
 const RegisterScreen = () => {
   const [name, setName] = useState("");
@@ -23,6 +26,33 @@ const RegisterScreen = () => {
   const source = require("../../assets/logo.png");
   const navigation = useNavigation();
 
+  const handleRegister = async () => {
+    const user = {
+      name: name,
+      email: email,
+      password: password,
+    };
+
+    //send a post request to the backend API
+    await axios
+      .post("http://192.168.0.29:8000/register", user)
+      .then((response) => {
+        Alert.alert(
+          "Registration successfully",
+          "You have registered successfully"
+        );
+        setName("");
+        setEmail("");
+        setPassword("");
+      })
+      .catch((error) => {
+        Alert.alert(
+          "Registration Error",
+          "An error occurred during the registration"
+        );
+        console.log("registration failed ", error);
+      });
+  };
   return (
     <SafeAreaView style={styles.SafeAreaView}>
       <View>
@@ -43,7 +73,7 @@ const RegisterScreen = () => {
                 style={styles.icon}
                 name="ios-person"
                 size={24}
-                color="gray"
+                color="black"
               />
             }
             textInputCss={styles.textInput(name)}
@@ -58,7 +88,7 @@ const RegisterScreen = () => {
                 style={styles.icon}
                 name="email"
                 size={24}
-                color="gray"
+                color="black"
               />
             }
             textInputCss={styles.textInput(email)}
@@ -74,7 +104,7 @@ const RegisterScreen = () => {
                 style={styles.icon}
                 name="lock1"
                 size={24}
-                color="gray"
+                color="black"
               />
             }
             textInputCss={styles.textInput(password)}
@@ -91,17 +121,18 @@ const RegisterScreen = () => {
 
         <View style={{ marginTop: 60 }}>
           <ButtonComponent
+            onPress={handleRegister}
             btnStyle={styles.btnStyle}
             txtStyle={styles.txtStyle}
-            title="Login"
+            title="Register"
           />
         </View>
         <View>
           <ButtonComponent
             onPress={() => navigation.navigate("Login")}
             btnStyle={{ marginTop: 15 }}
-            txtStyle={{ textAlign: "center", color: "gray", fontSize: 16 }}
-            title="Already Have an account? Sign in"
+            txtStyle={{ textAlign: "center", color: "black", fontSize: 16 }}
+            title={Keywords.ALREADY_HAVE_ACCOUNT}
           />
         </View>
       </KeyboardAvoidingView>
@@ -130,7 +161,7 @@ const styles = StyleSheet.create({
     return {
       marginVertical: 10,
       width: 300,
-      color: "gray",
+      color: "black",
       fontSize: updateValue,
     };
   },
@@ -140,9 +171,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
     gap: 5,
-    backgroundColor: "#D0D0D0",
     paddingVertical: 5,
     borderRadius: 5,
+    borderBottomColor: "#D0D0D0",
+    borderBottomWidth: 1,
   },
 
   forgotPassword: { color: "#007FFF", fontWeight: "500" },

@@ -5,12 +5,16 @@ import {
   View,
   KeyboardAvoidingView,
   Text,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { MaterialCommunityIcons, AntDesign } from "@expo/vector-icons";
 import TextInputComponent from "../components/TextInputComponent";
 import ButtonComponent from "../components/ButtonComponent";
 import { useNavigation } from "@react-navigation/native";
+import { Keywords } from "../utils/enum";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +22,25 @@ const LoginScreen = () => {
   const source = require("../../assets/logo.png");
   const navigation = useNavigation();
 
+  const handleLogin = () => {
+    const user = {
+      email: email,
+      password: password,
+    };
+    console.log(JSON.stringify(user));
+    axios
+      .post("http://192.168.0.29:8000/login", user)
+      .then((response) => {
+        // console.log(JSON.stringify(response));
+        const token = response.data.token;
+        AsyncStorage.setItem("authToken", token);
+        navigation.replace("Home");
+      })
+      .catch((error) => {
+        Alert.alert("Login Error", "Invalid Email");
+        console.log(error);
+      });
+  };
   return (
     <SafeAreaView style={styles.SafeAreaView}>
       <View>
@@ -37,7 +60,7 @@ const LoginScreen = () => {
                 style={styles.icon}
                 name="email"
                 size={24}
-                color="gray"
+                color="black"
               />
             }
             textInputCss={styles.textInput(email)}
@@ -53,7 +76,7 @@ const LoginScreen = () => {
                 style={styles.icon}
                 name="lock1"
                 size={24}
-                color="gray"
+                color="black"
               />
             }
             textInputCss={styles.textInput(password)}
@@ -70,6 +93,7 @@ const LoginScreen = () => {
 
         <View style={{ marginTop: 60 }}>
           <ButtonComponent
+            onPress={handleLogin}
             btnStyle={styles.btnStyle}
             txtStyle={styles.txtStyle}
             title="Login"
@@ -79,8 +103,8 @@ const LoginScreen = () => {
           <ButtonComponent
             onPress={() => navigation.navigate("Register")}
             btnStyle={{ marginTop: 15 }}
-            txtStyle={{ textAlign: "center", color: "gray", fontSize: 16 }}
-            title="Don't have an account? Sign up"
+            txtStyle={{ textAlign: "center", color: "black", fontSize: 16 }}
+            title={Keywords.DONT_HAVE_ACCOUNT}
           />
         </View>
       </KeyboardAvoidingView>
@@ -109,7 +133,7 @@ const styles = StyleSheet.create({
     return {
       marginVertical: 10,
       width: 300,
-      color: "gray",
+      color: "black",
       fontSize: updateValue,
     };
   },
@@ -119,9 +143,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 30,
     gap: 5,
-    backgroundColor: "#D0D0D0",
     paddingVertical: 5,
     borderRadius: 5,
+    borderBottomColor: "#D0D0D0",
+    borderBottomWidth: 1,
   },
 
   forgotPassword: { color: "#007FFF", fontWeight: "500" },
